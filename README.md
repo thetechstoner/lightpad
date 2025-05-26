@@ -41,7 +41,7 @@ $ sudo apt-get install com.github.libredeb.lightpad
    ```
    3. Create a build folder:
    ```
-      $ meson build --prefix=/usr
+      $ meson setup build --prefix=/usr
    ```
    4. Compile LightPad:
    ```
