@@ -36,7 +36,7 @@ $ sudo apt-get install com.github.libredeb.lightpad
    ```
    2. Clone this repository into your machine
    ```
-     $ git clone https://github.com/libredeb/lightpad.git
+     $ git clone https://github.com/thetechstoner/lightpad.git
      $ cd lightpad/
    ```
    3. Create a build folder:
