@@ -1,4 +1,4 @@
-![LightPad](https://raw.githubusercontent.com/libredeb/lightpad/master/logo.png)
+![LightPad](https://raw.githubusercontent.com/thetechstoner/lightpad/master/logo.png)
 
 LightPad is a lightweight, simple and powerful application launcher. It is also Wayland compatible.
 
