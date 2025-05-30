@@ -102,27 +102,26 @@ namespace LightPad.Frontend {
         private bool draw_icon (Gtk.Widget widget, Cairo.Context ctx) {
             Gtk.Allocation size;
             widget.get_allocation (out size);
-            var context = Gdk.cairo_create (widget.get_window ());
 
             // Draw icon
-            Gdk.cairo_set_source_pixbuf (context, this.icon, size.x + ((this.icon.width - size.width) / -2.0), size.y);
-            context.paint ();
+            Gdk.cairo_set_source_pixbuf (ctx, this.icon, size.x + ((this.icon.width - size.width) / -2.0), size.y);
+            ctx.paint ();
 
             // Truncate text
             Cairo.TextExtents extents;
-            context.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
-            context.set_font_size (this.font_size);
-            LightPad.Frontend.Utilities.truncate_text (context, size, 10, this.label, out this.label, out extents);
+            ctx.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
+            ctx.set_font_size (this.font_size);
+            LightPad.Frontend.Utilities.truncate_text (ctx, size, 10, this.label, out this.label, out extents);
 
             // Draw text shadow
-            context.move_to ((size.x + size.width/2 - extents.width/2) + 1, (size.y + size.height - 10) + 1);
-            context.set_source_rgba (0.0, 0.0, 0.0, 0.8);
-            context.show_text (this.label);
+            ctx.move_to ((size.x + size.width/2 - extents.width/2) + 1, (size.y + size.height - 10) + 1);
+            ctx.set_source_rgba (0.0, 0.0, 0.0, 0.8);
+            ctx.show_text (this.label);
 
             // Draw normal text
-            context.set_source_rgba (1.0, 1.0, 1.0, 1.0);
-            context.move_to (size.x + size.width/2 - extents.width/2, size.y + size.height - 10);
-            context.show_text (this.label);
+            ctx.set_source_rgba (1.0, 1.0, 1.0, 1.0);
+            ctx.move_to (size.x + size.width/2 - extents.width/2, size.y + size.height - 10);
+            ctx.show_text (this.label);
 
             return false;
         }
@@ -130,31 +129,30 @@ namespace LightPad.Frontend {
         private bool draw_background (Gtk.Widget widget, Cairo.Context ctx) {
             Gtk.Allocation size;
             widget.get_allocation (out size);
-            var context = Gdk.cairo_create (widget.get_window ());
 
             double progress;
             if (this.current_frame > 1) {
                 progress = (double)RUN_LENGTH/(double)this.current_frame;
             } else {
-                progress = 1;
+            progress = 1;
             }
 
             if (this.has_focus) {
                 double dark = 0.32;
                 var gradient = new Cairo.Pattern.rgba (this.prominent.R * dark, this.prominent.G * dark, this.prominent.B * dark, 0.8);
-                context.set_source (gradient);
-                LightPad.Frontend.Utilities.draw_rounded_rectangle (context, 10, 0.5, size);
-                context.fill ();
+                ctx.set_source (gradient);
+                LightPad.Frontend.Utilities.draw_rounded_rectangle (ctx, 10, 0.5, size);
+                ctx.fill ();
             }  else  {
-                if (this.current_frame > 1) {
-                    var gradient = new Cairo.Pattern.rgba (0.0, 0.0, 0.0, 0.0);
+            if (this.current_frame > 1) {
+            var gradient = new Cairo.Pattern.rgba (0.0, 0.0, 0.0, 0.0);
 
-                    context.set_source (gradient);
-                    LightPad.Frontend.Utilities.draw_rounded_rectangle (context, 10, 0.5, size);
-                    context.fill ();
+            ctx.set_source (gradient);
+            LightPad.Frontend.Utilities.draw_rounded_rectangle (ctx, 10, 0.5, size);
+            ctx.fill ();
                 }
             }
-            
+    
             return false;
         }
 
