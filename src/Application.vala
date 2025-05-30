@@ -199,27 +199,29 @@ public class LightPadWindow : Widgets.CompositedWindow {
             });
             return true;
         } );
-        // close Lightpad when we clic on empty area
-        this.button_release_event.connect ( () => {
-            // for some reason, the searchbar widget is part of the main_window (this)
-            // widget. So we can not check if the searchbar is focused or not. So this
-            // is a workaround based on the searchbar dimmensions and clicked position
-            // based on this widget.
-            int x, y;
-            int w, h;
-            this.searchbar.get_pointer(out x, out y);
-            this.searchbar.get_size_request(out w, out h);
-            if (( (x <= w) && (x >= 0) ) && ( (y <= h) && (y >= 0) )) {
-                return false;
-            } else {
-                this.hide();
-                GLib.Timeout.add_seconds (1, () => {
-                    this.destroy ();
-                    return GLib.Source.REMOVE;
-                });
-                return true;
-            }
-        } );
+this.button_release_event.connect((event) => {
+    double x = event.x;
+    double y = event.y;
+    int w, h;
+    this.searchbar.get_size_request(out w, out h);
+
+    Gtk.Allocation alloc;
+    this.searchbar.get_allocation(out alloc);
+
+    // Check if the click is within the searchbar area
+    if ((x >= alloc.x) && (x <= alloc.x + w) &&
+        (y >= alloc.y) && (y <= alloc.y + h)) {
+        return false;
+    } else {
+        this.hide();
+        GLib.Timeout.add_seconds(1, () => {
+            this.destroy();
+            return GLib.Source.REMOVE;
+        });
+        return true;
+    }
+});
+
         
     }
 
@@ -360,30 +362,23 @@ public class LightPadWindow : Widgets.CompositedWindow {
     }
 
     private bool draw_background (Gtk.Widget widget, Cairo.Context ctx) {
-        var context = Gdk.cairo_create (widget.get_window ());
-
         if (this.dynamic_background) {
-            if (image_pf != null) { // If JPG exist, prefer this
-	            context.scale (factor_scaling, factor_scaling);
-                Gdk.cairo_set_source_pixbuf (context, image_pf, 0, 0);
-            } else { // Is PNG image
-	            context.scale (factor_scaling, factor_scaling);
-	            context.set_source (pattern);
+            if (image_pf != null) {
+                ctx.scale (factor_scaling, factor_scaling);
+                Gdk.cairo_set_source_pixbuf (ctx, image_pf, 0, 0);
+            } else {
+                    ctx.scale (factor_scaling, factor_scaling);
+                    ctx.set_source (pattern);
             }
-
-            context.paint ();
+            ctx.paint ();
         } else {
-            // Semi-dark background
             Gtk.Allocation size;
             widget.get_allocation (out size);
-
             var linear_gradient = new Cairo.Pattern.linear (size.x, size.y, size.x, size.y + size.height);
             linear_gradient.add_color_stop_rgba (0.0, 0.30, 0.30, 0.30, 1);
-
-            context.set_source (linear_gradient);
-            context.paint ();
+            ctx.set_source (linear_gradient);
+            ctx.paint ();
         }
-
         return false;
     }
 
