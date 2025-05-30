@@ -37,8 +37,7 @@ This project was originally forked from Slingshot from the elementary team:
    ```
    4. Compile LightPad:
    ```
-      $ cd build
-      $ ninja
+      $ cd build && ninja
    ```
    5. Install LightPad in the system:
    ```
