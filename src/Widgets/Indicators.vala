@@ -129,46 +129,27 @@ namespace LightPad.Frontend {
         protected bool draw_background (Gtk.Widget widget, Cairo.Context ctx) {
             Gtk.Allocation size;
             widget.get_allocation (out size);
-            var context = Gdk.cairo_create (widget.get_window ());
-
-
+    
             double d = (double) this.animation_frames;
             double t = (double) this.current_frame;
+            double progress = ((t = t/d - 1) * t * t * t * t + 1);
 
-            double progress;
-
-            // easeOutQuint algorithm - aka - start normal end slow
-            progress = ((t = t/d - 1) * t * t * t * t + 1);
-
-            // Get allocations of old rectangle
             Gtk.Allocation size_old, size_new;
-            this.get_children ().nth_data (this.old_active).get_allocation (out size_old);
+            this.get_children().nth_data(this.old_active).get_allocation(out size_old);
+            this.get_children().nth_data(this.active).get_allocation(out size_new);
 
-            // Get allocations for the new rectangle
-            this.get_children ().nth_data (this.active).get_allocation (out size_new);
-
-            // Move and make a new rectangle, according to progress
             double x = size_old.x + (size_new.x - (double) size_old.x) * progress;
             double y = size_old.y + (size_new.y - (double) size_old.y);
             double width = size_old.width + (size_new.width - (double) size_old.width) * progress;
             double height = size_old.height + (size_new.height - (double) size_old.height);
 
-            double offset = 2.0; //  old: 7.0
-            double radius = 6.0; // old: 12.0
+            double offset = 2.0;
+            double radius = 6.0;
 
-            context.set_source_rgba (1.0, 1.0, 1.0, 1.0); // white background color
-            context.move_to (x + radius, size.y + offset);
-            // old code 
-            /* // Draw outside black stroke
-            context.set_source_rgba (0.1, 0.1, 0.1, 1.0);
-            context.move_to (x + radius + 1, size.y + offset + 1);
-            context.arc (x + width - radius - offset, size.y + size.height - radius - (offset / 2), radius, 0, Math.PI * 2);
-            context.set_line_width (1.0);
-            context.stroke ();
-                context.arc (x + width - radius - offset, size.y + size.height - radius - (offset / 2), radius, 0, Math.PI * 2);
-                */
-            context.arc (x + width/2, y + height/2, radius, 0, Math.PI * 2);
-            context.fill ();
+            ctx.set_source_rgba(1.0, 1.0, 1.0, 1.0);
+            ctx.move_to(x + radius, size.y + offset);
+            ctx.arc(x + width/2, y + height/2, radius, 0, Math.PI * 2);
+            ctx.fill();
 
             return false;
         }
