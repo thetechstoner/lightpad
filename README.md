@@ -16,15 +16,15 @@ This project was originally forked from Slingshot from the elementary team:
    1. Install dependencies:
    * For Ubuntu:
    ```
-      $ sudo apt-get install meson ninja-build libgee-0.8-dev libgnome-menu-3-dev cdbs valac libvala-*-dev libglib2.0-dev libwnck-3-dev libgtk-3-dev xterm python3 python3-wheel python3-setuptools gnome-menus
+      sudo apt-get install meson ninja-build libgee-0.8-dev libgnome-menu-3-dev cdbs valac libvala-*-dev libglib2.0-dev libwnck-3-dev libgtk-3-dev xterm python3 python3-wheel python3-setuptools gnome-menus
    ```
    * For Fedora:
    ```
-      $ sudo dnf install meson ninja-build libgee-devel gnome-menus-devel cdbs vala libvala-devel glib-devel libwnck-devel gtk3-devel xterm python3 python3-wheel python3-setuptools gnome-menus
+      sudo dnf install meson ninja-build libgee-devel gnome-menus-devel cdbs vala libvala-devel glib-devel libwnck-devel gtk3-devel xterm python3 python3-wheel python3-setuptools gnome-menus
    ```
    * For Arch Linux:
    ```
-      $ sudo pacman -Sy meson ninja libgee gnome-menus vala glib2 gdk-pixbuf2 libwnck3 gtk3 xterm python python-wheel python-setuptools
+      sudo pacman -Sy meson ninja libgee gnome-menus vala glib2 gdk-pixbuf2 libwnck3 gtk3 xterm python python-wheel python-setuptools
    ```
    2. Clone this repository into your machine
    ```
