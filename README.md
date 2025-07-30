@@ -28,24 +28,24 @@ This project was originally forked from Slingshot from the elementary team:
    ```
    2. Clone this repository into your machine
    ```
-     $ git clone https://github.com/thetechstoner/lightpad.git
-     $ cd lightpad/
+     git clone https://github.com/thetechstoner/lightpad.git
+     cd lightpad/
    ```
    3. Create a build folder:
    ```
-      $ meson setup build --prefix=/usr
+      meson setup build --prefix=/usr
    ```
    4. Compile LightPad:
    ```
-      $ cd build && ninja
+      cd build && ninja
    ```
    5. Install LightPad in the system:
    ```
-      $ sudo ninja install
+      sudo ninja install
    ```
    6. (OPTIONAL) Uninstall LightPad:
    ```
-      $ sudo ninja uninstall
+      sudo ninja uninstall
    ```
 
 ## Post Install
