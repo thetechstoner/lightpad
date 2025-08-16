@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=LightPad
+GenericName=Application Launcher
+Type=Application
+Comment=Lightweight, nice-looking and powerful application launcher
+Exec=lightpad
+Icon=lightpad
+Terminal=false
+NoDisplay=false
+StartupNotify=false
+Categories=GTK;Utility;

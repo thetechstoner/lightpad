@@ -1,83 +1,101 @@
 ![LightPad](https://raw.githubusercontent.com/thetechstoner/lightpad/master/logo.png)
 
-LightPad is a lightweight, simple and powerful application launcher. It is also Wayland compatible.
+# LightPad
 
-It is being developed for [Twister OS](https://twisteros.com/) and in collaboration with Ubuntu Budgie (and its [BudgieLightpad Applet](https://github.com/ubuntubudgie/budgie-lightpad-applet) for the system), a big thanks to [@fossfreedom](https://github.com/fossfreedom)
+LightPad is a lightweight, simple, and powerful application launcher. It is also Wayland compatible.
 
-This project was originally forked from Slingshot from the elementary team:
+Developed for [Twister OS](https://twisteros.com/) and in collaboration with Ubuntu Budgie (and its [BudgieLightpad Applet](https://github.com/ubuntubudgie/budgie-lightpad-applet)), with thanks to [@fossfreedom](https://github.com/fossfreedom).
 
-  * [https://launchpad.net/slingshot](https://launchpad.net/slingshot)
+Originally forked from Slingshot by the elementary team:  
+[https://launchpad.net/slingshot](https://launchpad.net/slingshot)
+
+---
 
 ## Screenshot
+
 ![Screenshot](https://raw.githubusercontent.com/thetechstoner/lightpad/master/screenshot.png)
 
-## Compilation
+---
 
-   1. Install dependencies:
-   * For Ubuntu:
-   ```
-      $ sudo apt-get install meson ninja-build libgee-0.8-dev libgnome-menu-3-dev cdbs valac libvala-*-dev libglib2.0-dev libwnck-3-dev libgtk-3-dev xterm python3 python3-wheel python3-setuptools gnome-menus
-   ```
-   * For Fedora:
-   ```
-      $ sudo dnf install meson ninja-build libgee-devel gnome-menus-devel cdbs vala libvala-devel glib-devel libwnck-devel gtk3-devel xterm python3 python3-wheel python3-setuptools gnome-menus
-   ```
-   * For Arch Linux:
-   ```
-      $ sudo pacman -Sy meson ninja libgee gnome-menus vala glib2 gdk-pixbuf2 libwnck3 gtk3 xterm python python-wheel python-setuptools
-   ```
-   2. Clone this repository into your machine
-   ```
-     $ git clone https://github.com/thetechstoner/lightpad.git
-     $ cd lightpad/
-   ```
-   3. Create a build folder:
-   ```
-      $ meson setup build --prefix=/usr
-   ```
-   4. Compile LightPad:
-   ```
-      $ cd build && ninja
-   ```
-   5. Install LightPad in the system:
-   ```
-      $ sudo ninja install
-   ```
-   6. (OPTIONAL) Uninstall LightPad:
-   ```
-      $ sudo ninja uninstall
-   ```
+## Features
+
+- Lightweight and fast GTK+ 3 application launcher
+- Wayland compatible
+- Custom dynamic backgrounds (JPG/PNG)
+- Application blacklist support
+- Alphabetical app sorting
+- Configurable grid and appearance
+- Easy packaging for Arch (PKGBUILD) and Fedora (RPM)
+- Open source (GPL-3.0-or-later)
+
+---
+
+## Installation
+
+### 1. Install Dependencies
+
+**Ubuntu:**
+sudo apt-get install meson ninja-build libgee-0.8-dev libgnome-menu-3-dev valac libglib2.0-dev libwnck-3-dev libgtk-3-dev xterm python3 python3-wheel python3-setuptools gnome-menus libjson-glib-dev libcairo2-dev
+
+**Fedora:**
+sudo dnf install meson ninja-build libgee-devel gnome-menus-devel vala-devel glib2-devel libwnck3-devel gtk3-devel xterm python3 python3-wheel python3-setuptools gnome-menus json-glib-devel cairo-devel
+
+**Arch Linux:**
+sudo pacman -Sy meson ninja libgee gnome-menus vala glib2 gdk-pixbuf2 libwnck3 gtk3 xterm python python-wheel python-setuptools json-glib cairo
+
+### 2. Clone and Build
+
+git clone https://github.com/thetechstoner/lightpad.git
+cd lightpad/
+meson setup build --prefix=/usr
+cd build
+ninja
+
+### 3. Install
+
+sudo ninja install
+
+### 4. (Optional) Uninstall
+
+sudo ninja uninstall
+
+---
 
 ## Post Install
 
-Once installed set shortcut key to access LightPad.
+Set a shortcut key to launch LightPad:
 
-  * System -> Preferences -> Hardware -> Keyboard Shortcuts > click Add
-  * Name: LightPad
-  * Command: com.github.libredeb.lightpad
+- Go to **System → Preferences → Hardware → Keyboard Shortcuts** and click **Add**
+- **Name:** LightPad  
+- **Command:** lightpad
 
-Now assign it a shortcut key, such as CTRL+SPACE.
+Assign a shortcut key, such as `Ctrl+Space`.
 
-**Note:** Some themes don't have the 'application-default-icon'. LightPad needs to have this icon, so please download it from the [elementary_os/icons](https://github.com/elementary/icons/blob/master/apps/128/application-default-icon.svg) pack and execute the following commands:
-```
-# cp application-default-icon.svg /usr/share/icons/hicolor/scalable/apps/
-# gtk-update-icon-cache /usr/share/icons/hicolor
-```
+**Note:**  
+Some icon themes may lack the `application-default-icon`. Download it from [elementary_os/icons](https://github.com/elementary/icons/blob/master/apps/128/application-default-icon.svg) and run:
+sudo cp application-default-icon.svg /usr/share/icons/hicolor/scalable/apps/
+sudo gtk-update-icon-cache /usr/share/icons/hicolor
 
-## Dynamic Background (optional feature)
+---
 
-LighPad added a new feature, now you can use a custom background of your choice. You can add any wallpaper or image strictly under some of the following path/files and lightpad will use them (prioritizing the JPG format):
-> `$HOME/.lightpad/background.jpg`
+## Dynamic Background (Optional)
 
-> `$HOME/.lightpad/background.png`
+You can set a custom background image by placing it at:
 
-## Blacklist File (optional feature)
+- `$HOME/.lightpad/background.jpg`
+- `$HOME/.lightpad/background.png`
 
-Another new added functionality, is the ability to hide applications using a blacklist file. In the file:
-> `$HOME/.lightpad/blacklist`
+JPG is prioritized if both exist.
 
-You must add line by line the full name of the binaries of the applications you want to hide in LightPad. For example:
-```
+---
+
+## Blacklist File (Optional)
+
+Hide applications by listing their binary names (as found in the `Exec=` line of their `.desktop` files) in:
+
+- `$HOME/.lightpad/blacklist`
+
+Example:
 nautilus
 rhythmbox
 gnome-screenshot
@@ -86,59 +104,66 @@ firefox
 htop
 /usr/bin/gparted
 /usr/bin/vlc
-```
 
-These lines appear in the **.desktop** files located in `/usr/share/applications` as the value of the **Exec=** tag.
-
+---
 
 ## Changelog
+
 **Version 0.0.9**
-* Fixed [issue #26](https://github.com/libredeb/lightpad/issues/26), opens in wrong monitor
-* Fixed [issue #28](https://github.com/libredeb/lightpad/issues/28), can't run gnome apps
-* Fixed [issue #23](https://github.com/libredeb/lightpad/issues/23), can't exit clicking on an empty area
-* Release in progress... 
+- Fixed [issue #26](https://github.com/libredeb/lightpad/issues/26): opens in wrong monitor
+- Fixed [issue #28](https://github.com/libredeb/lightpad/issues/28): can't run GNOME apps
+- Fixed [issue #23](https://github.com/libredeb/lightpad/issues/23): can't exit by clicking on empty area
+- Release in progress...
 
 **Version 0.0.8**
-* Templates added to make packages for Arch Linux (PKG) and Fedora (RPM)
-* Config files are introduced for project constants, replacing the hardcoded paths
-* Clean CSS code, some vars and unused functionality
-* New feature added: hide apps using a blacklist file.
-* The paths of background files are moved to `$HOME/.lightpad/`
+- Arch Linux (PKG) and Fedora (RPM) packaging templates added
+- Config files introduced for project constants (no more hardcoded paths)
+- CSS and code cleanup
+- App blacklist feature added
+- Background file paths moved to `$HOME/.lightpad/`
 
 **Version 0.0.7**
-* Change indicator pages text for dots without animations
-* Fixed the CSS design of the searchbar that made it look cut on some screens
-* Implemented a new feature, now the black background is dynamic using an image if there exists
-* Added a new feature, now the apps are ordered alphabetically
-* Add SPEC and PKGBUILD files to make packages for Fedora and Arch Linux
-* Some bug fixing
+- Page indicators changed to dots, removed animations
+- Searchbar CSS fixed for all screens
+- Dynamic background image support
+- Apps sorted alphabetically
+- Added SPEC and PKGBUILD packaging
+- Bug fixes
 
 **Version 0.0.5**
-* Implemented the exact and standard way to open terminal apps
-* Improved meson postinstall script
-* Removed desktop environments detection to use the appropiate terminal
-* Added xterm as dependency for opening terminal apps
+- Standardized terminal app launching
+- Improved postinstall script
+- Removed DE detection for terminal
+- Added xterm as dependency
 
 **Version 0.0.4**
-* Fix an important bug in the page indicators causing the wrong size obtained
-* Background color brightness of page indicators increased
-* Improved the visual appearance of the searchbar
-* Increased space between top edge of display and searchbar
+- Fixed page indicator sizing bug
+- Improved page indicator and searchbar appearance
 
 **Version 0.0.3**
-* Fix bug 003, where obtain a negative one causing error obtaining array index for indicator pages
-* Add suport for LXQT, LXDE and XFCE environments to open terminal apps
-* Improve searchbar design, use CSS instead of cairo
+- Fixed negative array index bug
+- LXQT, LXDE, XFCE terminal support
+- Searchbar uses CSS
 
 **Version 0.0.2**
-* Add dependencies versioning
-* Fix a bug with gee assertion index
-* Fix bug that cause that terminal apps won't open
-* Improve screen recognition for detect netbooks small display
+- Added dependency versioning
+- Fixed gee assertion bug
+- Fixed terminal app launching bug
+- Improved netbook screen detection
 
 **Version 0.0.1**
-* Clean all code from the fork
-* New improved searchbar design
-* New revamped icon in different resolutions
-* Fix bug for some applications that left their icon in /usr/share/pixmaps
-* Support for terminal apps
+- Code cleanup from fork
+- Improved searchbar design
+- New icon in multiple resolutions
+- Fixed icon fallback bug
+- Terminal app support
+
+---
+
+## License
+
+GPL-3.0-or-later
+
+---
+
+For more details, see the [source code](https://github.com/thetechstoner/lightpad).

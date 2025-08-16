@@ -1,4 +1,39 @@
+# Editor/OS/user files
 *~
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+/build/
 build/
+meson-private/
+meson-logs/
+
+# Packaging
 *lightpad-*.pkg.*
-how_to_run.txt
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.zip
+
+# Distribution/installer files
+*.deb
+*.rpm
+
+# Compiled files
+*.o
+*.so
+*.a
+
+# IDE/project files
+.vscode/
+.idea/
+*.user
+*.workspace
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo

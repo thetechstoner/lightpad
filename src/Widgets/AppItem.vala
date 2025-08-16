@@ -1,161 +1,183 @@
-/*
-* Copyright (c) 2011-2020 LightPad
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation; either
-* version 2 of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* General Public License for more details.
-*
-* You should have received a copy of the GNU General Public
-* License along with this program; if not, write to the
-* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-* Boston, MA 02110-1301 USA
-*
-* Authored by: Juan Pablo Lozano <libredeb@gmail.com>
-*/
+using Gtk;
+using Gee;
 
 namespace LightPad.Frontend {
 
-    public class AppItem : Gtk.EventBox {
-    
-        private Gdk.Pixbuf icon;
-        private LightPad.Frontend.Color prominent;
-        private string label;
-        private Gtk.Box wrapper;
-        private double font_size;
-        private int icon_size;
+public class AppItem : Gtk.EventBox {
+    public Gee.HashMap<string, string> app_info;
+    public int icon_size;
+    public int font_size;
+    public int item_box_width;
+    public int item_box_height;
+    private Gtk.Image icon_widget;
+    protected Gtk.Label name_label;
+    protected Gtk.Label desc_label;
+    private Gtk.Box wrapper;
 
-        const int FPS = 24;
-        const int DURATION = 200;
-        const int RUN_LENGTH = (int)(DURATION/FPS); // Total number of frames
-        private int current_frame = 1; // Run length, in frames
+    public signal void item_dropped(AppItem source, AppItem target);
 
-        public AppItem (int size, double font_size, int box_width, int box_height) {
-            this.icon_size = size;
-            this.font_size = font_size;
-
-            // EventBox Properties, a box that show up on hover
-            this.set_visible_window (false);
-            this.can_focus = true;
-            // Height is also the padding between icon and label's height
-            this.set_size_request (box_width, box_height);
-
-            // VBox properties
-            this.wrapper = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            this.wrapper.draw.connect (this.draw_icon);
-            this.add (this.wrapper);
-
-            // Focused signals
-            this.draw.connect (this.draw_background);
-            this.focus_in_event.connect ( () => { this.focus_in (); return true; } );
-            this.focus_out_event.connect ( () => { this.focus_out (); return true; } );
-        }
-        
-        public void change_app (Gdk.Pixbuf new_icon, string new_name, string new_tooltip) {
-            this.current_frame = 1;
-
-            // Icon
-            this.icon = new_icon;
-            this.prominent = LightPad.Frontend.Utilities.average_color (this.icon);
-
-            // Label
-            this.label = new_name;
-
-            // Tooltip
-            this.set_tooltip_text (new_tooltip);
-
-            // Redraw
-            this.wrapper.queue_draw ();
-        }
-        
-        public new void focus_in () {
-            GLib.Timeout.add (((int)(1000/FPS)), () => {
-                if (this.current_frame >= RUN_LENGTH || !this.has_focus) {
-                    current_frame = 1;
-                    return false; // Stop animation
-                }
-
-                queue_draw ();
-                this.current_frame++;
-                return true;
-            });
-        }
-        
-        public new void focus_out () {
-            GLib.Timeout.add (((int)(1000/FPS)), () => {
-                if (this.current_frame >= RUN_LENGTH || this.has_focus) {
-                    current_frame = 1;
-                    return false; // Stop animation
-                }
-
-                queue_draw ();
-                this.current_frame++;
-                return true;
-            });
-        }
-        
-        private bool draw_icon (Gtk.Widget widget, Cairo.Context ctx) {
-            Gtk.Allocation size;
-            widget.get_allocation (out size);
-
-            // Draw icon
-            Gdk.cairo_set_source_pixbuf (ctx, this.icon, size.x + ((this.icon.width - size.width) / -2.0), size.y);
-            ctx.paint ();
-
-            // Truncate text
-            Cairo.TextExtents extents;
-            ctx.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
-            ctx.set_font_size (this.font_size);
-            LightPad.Frontend.Utilities.truncate_text (ctx, size, 10, this.label, out this.label, out extents);
-
-            // Draw text shadow
-            ctx.move_to ((size.x + size.width/2 - extents.width/2) + 1, (size.y + size.height - 10) + 1);
-            ctx.set_source_rgba (0.0, 0.0, 0.0, 0.8);
-            ctx.show_text (this.label);
-
-            // Draw normal text
-            ctx.set_source_rgba (1.0, 1.0, 1.0, 1.0);
-            ctx.move_to (size.x + size.width/2 - extents.width/2, size.y + size.height - 10);
-            ctx.show_text (this.label);
-
-            return false;
-        }
-
-        private bool draw_background (Gtk.Widget widget, Cairo.Context ctx) {
-            Gtk.Allocation size;
-            widget.get_allocation (out size);
-
-            double progress;
-            if (this.current_frame > 1) {
-                progress = (double)RUN_LENGTH/(double)this.current_frame;
-            } else {
-            progress = 1;
-            }
-
-            if (this.has_focus) {
-                double dark = 0.32;
-                var gradient = new Cairo.Pattern.rgba (this.prominent.R * dark, this.prominent.G * dark, this.prominent.B * dark, 0.8);
-                ctx.set_source (gradient);
-                LightPad.Frontend.Utilities.draw_rounded_rectangle (ctx, 10, 0.5, size);
-                ctx.fill ();
-            }  else  {
-            if (this.current_frame > 1) {
-            var gradient = new Cairo.Pattern.rgba (0.0, 0.0, 0.0, 0.0);
-
-            ctx.set_source (gradient);
-            LightPad.Frontend.Utilities.draw_rounded_rectangle (ctx, 10, 0.5, size);
-            ctx.fill ();
-                }
-            }
-    
-            return false;
-        }
-
+    public enum AppDragTargets {
+        TARGET_ENTRY_LIST,
+        TARGET_APP_ITEM
     }
+
+    private static Gtk.TargetEntry[] APP_DRAG_TARGETS = {
+        { "APP_ITEM", Gtk.TargetFlags.SAME_APP, AppDragTargets.TARGET_APP_ITEM },
+        { "ENTRY_LIST", Gtk.TargetFlags.SAME_APP, AppDragTargets.TARGET_ENTRY_LIST }
+    };
+
+    construct {
+        Gtk.drag_source_set(this,
+            Gdk.ModifierType.BUTTON1_MASK,
+            APP_DRAG_TARGETS,
+            Gdk.DragAction.MOVE
+        );
+        this.drag_begin.connect((ctx) => {
+            var pixbuf = this.icon_widget.get_pixbuf();
+            if (pixbuf != null) {
+                var icon = new Gtk.Image.from_pixbuf(pixbuf);
+                Gtk.drag_set_icon_widget(ctx, icon, 0, 0);
+            }
+        });
+        this.drag_data_get.connect((ctx, sel, info, time) => {
+            if (this.app_info != null && this.app_info.has_key("desktop_file")) {
+                var desktop_file = this.app_info["desktop_file"];
+                if (desktop_file != null) {
+                    sel.set(
+                        Gdk.Atom.intern_static_string("text/plain"),
+                        8,
+                        (uint8[]) desktop_file.data
+                    );
+                }
+            }
+        });
+        Gtk.drag_dest_set(this,
+            Gtk.DestDefaults.ALL,
+            APP_DRAG_TARGETS,
+            Gdk.DragAction.MOVE
+        );
+        this.drag_drop.connect((ctx, x, y, time) => {
+            var source_item = Gtk.drag_get_source_widget(ctx) as AppItem;
+            if (source_item != null && source_item != this) {
+                this.item_dropped(source_item, this);
+            }
+            return true;
+        });
+    }
+
+    public AppItem(
+        Gee.HashMap<string, string>? app_info,
+        int icon_size,
+        int font_size,
+        int box_width,
+        int box_height
+    ) {
+        // Defensive: ensure app_info is never null
+        this.app_info = app_info ?? new Gee.HashMap<string, string>();
+        this.icon_size = icon_size;
+        this.font_size = font_size;
+        this.item_box_width = box_width;
+        this.item_box_height = box_height;
+        this.set_visible_window(false);
+        this.can_focus = true;
+        this.set_size_request(box_width, box_height);
+
+        this.wrapper = new Gtk.Box(Gtk.Orientation.VERTICAL, 2);
+        this.wrapper.set_halign(Gtk.Align.CENTER);
+        this.wrapper.set_valign(Gtk.Align.CENTER);
+
+        this.icon_widget = new Gtk.Image();
+        this.icon_widget.set_pixel_size(this.icon_size);
+        this.icon_widget.set_halign(Gtk.Align.CENTER);
+        this.wrapper.pack_start(this.icon_widget, false, false, 0);
+
+        this.name_label = new Gtk.Label("");
+        this.name_label.set_halign(Gtk.Align.CENTER);
+        this.name_label.set_ellipsize(Pango.EllipsizeMode.END);
+        this.name_label.set_max_width_chars(24);
+        this.name_label.set_line_wrap(false);
+        this.name_label.set_use_markup(true);
+        this.name_label.set_justify(Gtk.Justification.CENTER);
+        this.name_label.set_margin_top(4);
+        this.name_label.set_margin_bottom(0);
+        this.wrapper.pack_start(this.name_label, false, false, 0);
+
+        this.desc_label = new Gtk.Label("");
+        this.desc_label.set_halign(Gtk.Align.CENTER);
+        this.desc_label.set_ellipsize(Pango.EllipsizeMode.END);
+        this.desc_label.set_max_width_chars(32);
+        this.desc_label.set_line_wrap(true);
+        this.desc_label.set_use_markup(true);
+        this.desc_label.set_justify(Gtk.Justification.CENTER);
+        this.desc_label.get_style_context().add_class("dim-label");
+        this.desc_label.set_margin_top(0);
+        this.desc_label.set_margin_bottom(2);
+        this.wrapper.pack_start(this.desc_label, false, false, 0);
+
+        this.add(this.wrapper);
+
+        this.draw.connect(this.draw_background);
+        this.focus_in_event.connect(() => { this.focus_in(); return true; });
+        this.focus_out_event.connect(() => { this.focus_out(); return true; });
+
+        // Set initial app info if provided
+        set_app_info(
+            (this.app_info != null && this.app_info.has_key("name")) ? this.app_info["name"] : "",
+            (this.app_info != null && this.app_info.has_key("description")) ? this.app_info["description"] : "",
+            null, // Icon will be set later if needed
+            (this.app_info != null && this.app_info.has_key("command")) ? this.app_info["command"] : ""
+        );
+    }
+
+    public void set_app_info(string? name, string? description, Gdk.Pixbuf? icon, string? command) {
+        if (icon != null) {
+            this.icon_widget.set_from_pixbuf(icon);
+        } else {
+            this.icon_widget.clear();
+        }
+        if (name != null && name.strip() != "") {
+            this.name_label.set_markup("<b>" + GLib.Markup.escape_text(name) + "</b>");
+        } else {
+            this.name_label.set_markup("<b>Unknown</b>");
+        }
+        if (description != null && description.strip() != "") {
+            this.desc_label.set_markup("<span size='small'>" + GLib.Markup.escape_text(description) + "</span>");
+        } else {
+            this.desc_label.set_markup("");
+        }
+        if (name != null && name.strip() != "" && description != null && description.strip() != "")
+            this.set_tooltip_text("%s\n%s".printf(name, description));
+        else if (name != null && name.strip() != "")
+            this.set_tooltip_text(name);
+        else
+            this.set_tooltip_text("");
+    }
+
+    public void change_app(Gdk.Pixbuf? new_icon, string? new_name, string? new_tooltip) {
+        set_app_info(new_name, new_tooltip, new_icon, "");
+    }
+
+    public virtual void focus_in() {
+        this.get_style_context().add_class("selected");
+    }
+
+    public virtual void focus_out() {
+        this.get_style_context().remove_class("selected");
+    }
+
+    protected virtual bool draw_background(Gtk.Widget widget, Cairo.Context ctx) {
+        if (widget == null || !widget.get_realized()) {
+            return false;
+        }
+        Gtk.Allocation size;
+        widget.get_allocation(out size);
+        if (this.has_focus) {
+            ctx.set_source_rgba(0.2, 0.5, 0.9, 0.18); // semi-transparent highlight
+            ctx.rectangle(0, 0, size.width, size.height);
+            ctx.fill();
+        }
+        return false;
+    }
+}
 
 }
